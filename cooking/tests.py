@@ -55,12 +55,13 @@ class IngredientTestCase (TestCase):
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-class RecipeTestCase(TestCase):
+class RecipeTestCase (TestCase):
 
     def setUp(self):
+        self.main_course = FoodCategory.objects.create(name='Main')
         self.shoyu = Recipe.objects.create(
             name='Shoyu Ramen',
-            foodcategory=self.main.id,
+            foodcategory_id=self.main_course.id,
             prep_time_from='5',
             prep_time_to='15',
             cooking_time_from='30',
@@ -77,22 +78,22 @@ class RecipeTestCase(TestCase):
         # Recipe Ingredients
 
         self.ingredient_1 = RecipeIngredient.objects.create(
-            recipe=self.shoyu.id,
-            ingredient=self.soy.id,
+            recipe_id=self.shoyu.id,
+            ingredient_id=self.soy.id,
             quantity='2tbsp',
             detail='Dark Soy Sauce',
             order=1
         )
         self.ingredient_2 = RecipeIngredient.objects.create(
-            recipe=self.shoyu.id,
-            ingredient=self.broth.id,
+            recipe_id=self.shoyu.id,
+            ingredient_id=self.broth.id,
             quantity='2 Cups',
             detail='',
             order=2
         )
         self.ingredient_3 = RecipeIngredient.objects.create(
-            recipe=self.shoyu.id,
-            ingredient=self.egg.id,
+            recipe_id=self.shoyu.id,
+            ingredient_id=self.egg.id,
             quantity='1',
             detail='Soft Boiled',
             order=3
@@ -100,15 +101,15 @@ class RecipeTestCase(TestCase):
 
         # Procedures
         self.step_1 = Procedure.objects.create(
-            recipe=self.shoyu.id,
+            recipe_id=self.shoyu.id,
             description='Cook Broth',
             order=1)
         self.step_2 = Procedure.objects.create(
-            recipe=self.shoyu.id,
+            recipe_id=self.shoyu.id,
             description='Cook Egg',
             order=2)
         self.step_3 = Procedure.objects.create(
-            recipe=self.shoyu.id,
+            recipe_id=self.shoyu.id,
             description='Create Layers, add soy first, then broth, topped with egg',
             order=3)
 
@@ -142,7 +143,7 @@ class RecipeByFoodCategoryTestCase (TestCase):
 
         self.shoyu = Recipe.objects.create(
             name='Shoyu Ramen',
-            foodcategory=self.main.id,
+            foodcategory_id=self.main.id,
             prep_time_from='5',
             prep_time_to='15',
             cooking_time_from='30',
@@ -152,7 +153,7 @@ class RecipeByFoodCategoryTestCase (TestCase):
             )
         self.steak = Recipe.objects.create(
             name='Pipz Steak',
-            foodcategory=self.main.id,
+            foodcategory_id=self.main.id,
             prep_time_from='2',
             prep_time_to='10',
             cooking_time_from='6',
@@ -162,7 +163,7 @@ class RecipeByFoodCategoryTestCase (TestCase):
             )
         self.invalid_recipe = Recipe.objects.create(
             name='Dumplings',
-            foodcategory=self.appetizer.id,
+            foodcategory_id=self.appetizer.id,
             prep_time_from='5',
             prep_time_to='10',
             cooking_time_from='8',
@@ -173,9 +174,10 @@ class RecipeByFoodCategoryTestCase (TestCase):
     
     def test_api_can_get_all_recipe_from_main_course(self):
         response = client.get(
-            reverse('recipe',
-                kwargs={'foodcategory': self.main.id},
-                format='json'))
+            reverse(
+                'recipe',
+                kwargs={'foodcategory_id': self.main.id}),
+            format='json')
         
         recipes = Recipe.objects.get(foodcategory=self.main.id)
         serializer = RecipeSerializer(recipes, many=True)
