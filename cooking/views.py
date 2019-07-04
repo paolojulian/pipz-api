@@ -26,11 +26,12 @@ class FoodCategoryDetails(generics.RetrieveUpdateDestroyAPIView):
 #cooking/recipe
 class CreateRecipe(APIView):
     '''
-    [POST, GET] This class is used to create a recipe and get all recipes
+    [POST, GET] This class is used to create a recipe and get recipes by foodcategory
     '''
 
     def get(self, request):
         foodcategory = request.query_params.get('foodcategory')
+
         # Set the default value if sort_by is null
         if not foodcategory:
             foodcategory = 4 #Main Course

@@ -26,9 +26,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             'foodcategory',
             'foodcategory_name',
             'prep_time_from',
-            'prep_time_to'
+            'prep_time_to',
             'cooking_time_from',
-            'cooking_time_to'
+            'cooking_time_to',
             'description',
             'image_path'
             )

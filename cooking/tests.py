@@ -1,4 +1,5 @@
 # cooking/tests.py
+import logging
 
 from django.test import TestCase
 
@@ -62,10 +63,10 @@ class RecipeTestCase (TestCase):
         self.shoyu = Recipe.objects.create(
             name='Shoyu Ramen',
             foodcategory_id=self.main_course.id,
-            prep_time_from='5',
-            prep_time_to='15',
-            cooking_time_from='30',
-            cooking_time_to='60',
+            prep_time_from=5,
+            prep_time_to=15,
+            cooking_time_from=30,
+            cooking_time_to=60,
             description='Hot noodle soup that is consists of soy based seasoning',
             image_path='ramen.jpg'
             )
@@ -81,21 +82,21 @@ class RecipeTestCase (TestCase):
             recipe_id=self.shoyu.id,
             ingredient_id=self.soy.id,
             quantity='2tbsp',
-            detail='Dark Soy Sauce',
+            details='Dark Soy Sauce',
             order=1
         )
         self.ingredient_2 = RecipeIngredient.objects.create(
             recipe_id=self.shoyu.id,
             ingredient_id=self.broth.id,
             quantity='2 Cups',
-            detail='',
+            details='',
             order=2
         )
         self.ingredient_3 = RecipeIngredient.objects.create(
             recipe_id=self.shoyu.id,
             ingredient_id=self.egg.id,
             quantity='1',
-            detail='Soft Boiled',
+            details='Soft Boiled',
             order=3
         )
 
@@ -123,16 +124,17 @@ class RecipeTestCase (TestCase):
         recipe_serialized = RecipeSerializer(recipe)
 
         # get ingredients
-        ingredients = RecipeIngredient.objects.get(recipe=self.shoyu.id)
+        ingredients = RecipeIngredient.objects.filter(recipe=self.shoyu.id)
         ingredients_serialized = RecipeIngredientSerializer(ingredients, many=True)
 
         # get procedures
-        procedures = Procedure.objects.get(recipe=self.shoyu.id)
+        procedures = Procedure.objects.filter(recipe=self.shoyu.id)
         procedures_serialized = ProcedureSerializer(procedures, many=True)
+        self.assertLogs(response.data)
 
-        self.assertEqual(response.data.recipe, recipe_serialized.data)
-        self.assertEqual(response.data.ingredients, ingredients_serialized.data)
-        self.assertEqual(response.data.procedures, procedures_serialized.data)
+        self.assertEqual(response.data['recipe'], recipe_serialized.data)
+        self.assertEqual(response.data['ingredients'], ingredients_serialized.data)
+        self.assertEqual(response.data['procedures'], procedures_serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
@@ -144,45 +146,42 @@ class RecipeByFoodCategoryTestCase (TestCase):
         self.shoyu = Recipe.objects.create(
             name='Shoyu Ramen',
             foodcategory_id=self.main.id,
-            prep_time_from='5',
-            prep_time_to='15',
-            cooking_time_from='30',
-            cooking_time_to='60',
+            prep_time_from=5,
+            prep_time_to=15,
+            cooking_time_from=30,
+            cooking_time_to=60,
             description='Hot noodle soup that is consists of soy based seasoning',
             image_path='ramen.jpg'
             )
         self.steak = Recipe.objects.create(
             name='Pipz Steak',
             foodcategory_id=self.main.id,
-            prep_time_from='2',
-            prep_time_to='10',
-            cooking_time_from='6',
-            cooking_time_to='10',
+            prep_time_from=2,
+            prep_time_to=10,
+            cooking_time_from=6,
+            cooking_time_to=10,
             description='Medium rare steak with chimuchuri dipping sauce',
             image_path='steak.jpg'
             )
         self.invalid_recipe = Recipe.objects.create(
             name='Dumplings',
             foodcategory_id=self.appetizer.id,
-            prep_time_from='5',
-            prep_time_to='10',
-            cooking_time_from='8',
-            cooking_time_to='10',
+            prep_time_from=5,
+            prep_time_to=10,
+            cooking_time_from=8,
+            cooking_time_to=10,
             description='Potstickers filled with pork and vegetable combinationed, crisp on one side and soft on the other',
             image_path='dumplings.jpg'
             )
     
     def test_api_can_get_all_recipe_from_main_course(self):
-        response = client.get(
-            reverse(
-                'recipe',
-                kwargs={'foodcategory_id': self.main.id}),
-            format='json')
+        query_params = {'foodcategory': self.main.id}
+        response = client.get(reverse('recipe'), query_params)
         
-        recipes = Recipe.objects.get(foodcategory=self.main.id)
-        serializer = RecipeSerializer(recipes, many=True)
+        recipes = Recipe.objects.filter(foodcategory=self.main.id)
+        recipes_serialized = RecipeSerializer(recipes, many=True)
 
-        self.assertEqual(response.data, recipes.data)
+        self.assertEqual(response.data, recipes_serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     
