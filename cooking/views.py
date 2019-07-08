@@ -32,13 +32,13 @@ class CreateRecipe(APIView):
     def get(self, request):
         foodcategory = request.query_params.get('foodcategory')
 
-        # Set the default value if sort_by is null
+        # Set the default value if foodcategory is null
         if not foodcategory:
-            foodcategory = 4 #Main Course
+            foodcategory = 4 # Main Course
 
         recipes = Recipe.objects.filter(foodcategory=foodcategory)
         serializer = RecipeSerializer(recipes, many=True).data
-        return Response(serializer)
+        return Response(data=serializer, status=status.HTTP_200_OK)
 
     def post(self, request):
         try:

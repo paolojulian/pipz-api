@@ -59,7 +59,10 @@ class IngredientTestCase (TestCase):
 class RecipeTestCase (TestCase):
 
     def setUp(self):
+        # Food Category
         self.main_course = FoodCategory.objects.create(name='Main')
+
+        # Recipe
         self.shoyu = Recipe.objects.create(
             name='Shoyu Ramen',
             foodcategory_id=self.main_course.id,
@@ -77,7 +80,6 @@ class RecipeTestCase (TestCase):
         self.egg = Ingredient.objects.create(name='Egg')
 
         # Recipe Ingredients
-
         self.ingredient_1 = RecipeIngredient.objects.create(
             recipe_id=self.shoyu.id,
             ingredient_id=self.soy.id,
@@ -141,7 +143,6 @@ class RecipeTestCase (TestCase):
 class RecipeByFoodCategoryTestCase (TestCase):
     def setUp(self):
         self.main = FoodCategory.objects.create(name='Main')
-        self.appetizer = FoodCategory.objects.create(name='appetizer')
 
         self.shoyu = Recipe.objects.create(
             name='Shoyu Ramen',
@@ -163,17 +164,8 @@ class RecipeByFoodCategoryTestCase (TestCase):
             description='Medium rare steak with chimuchuri dipping sauce',
             image_path='steak.jpg'
             )
-        self.invalid_recipe = Recipe.objects.create(
-            name='Dumplings',
-            foodcategory_id=self.appetizer.id,
-            prep_time_from=5,
-            prep_time_to=10,
-            cooking_time_from=8,
-            cooking_time_to=10,
-            description='Potstickers filled with pork and vegetable combinationed, crisp on one side and soft on the other',
-            image_path='dumplings.jpg'
-            )
     
+    #TODO - all should be minimized to 10 recipes only (Include Pagination)
     def test_api_can_get_all_recipe_from_main_course(self):
         query_params = {'foodcategory': self.main.id}
         response = client.get(reverse('recipe'), query_params)
@@ -184,4 +176,6 @@ class RecipeByFoodCategoryTestCase (TestCase):
         self.assertEqual(response.data, recipes_serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
+class UploadResourceTestCase (TestCase):
+    pass
     

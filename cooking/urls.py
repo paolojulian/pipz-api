@@ -20,7 +20,7 @@ urlpatterns = [
     re_path(r'^foodcategory/(?P<pk>[0-9]+)/$', FoodCategoryDetails.as_view(), name='foodcategory_details'),
 
     # RECIPE
-    # POST - create food category, GET - get all food category
+    # POST - create food category, GET - get all recipes by food category
     re_path(r'^recipe/$', CreateRecipe.as_view(), name='recipe'),
     re_path(r'^recipe/(?P<pk>[0-9]+)/$', RecipeDetails.as_view(), name='recipe_details'),
 

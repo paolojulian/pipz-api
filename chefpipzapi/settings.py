@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'cooking',
-    'music'
+    'music',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -140,3 +141,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CORS_ORIGIN_WHITELIST = 'http://localhost:80', 'http://localhost', 'localhost'
+
+# AWS S3 BUCKET
